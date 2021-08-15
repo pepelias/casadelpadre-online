@@ -21,9 +21,13 @@ type Stream struct {
 var (
 	WS     = melody.New()
 	STREAM = &Stream{
-		Online:  true,
-		Streams: make(map[string]string),
-		Chat:    make([]map[string]interface{}, 0),
+		Online: true,
+		Streams: map[string]string{
+			"240p": "http://192.168.1.135:8080/video/video240.mp4",
+			"480p": "http://192.168.1.135:8080/video/video480.mp4",
+			"720p": "http://192.168.1.135:8080/video/video720.mp4",
+		},
+		Chat: make([]map[string]interface{}, 0),
 	}
 )
 
@@ -77,7 +81,9 @@ func main() {
 func Router(e *echo.Echo) {
 	e.GET("/v1/streaming/online", func(c echo.Context) error {
 		if STREAM.Online {
-			return c.NoContent(http.StatusOK)
+			return c.JSON(http.StatusOK, struct {
+				Streams map[string]string `json:"streams"`
+			}{STREAM.Streams})
 		}
 		return c.NoContent(http.StatusNotFound)
 	})
@@ -89,6 +95,7 @@ func Router(e *echo.Echo) {
 		return nil
 	})
 	// Endpoints para NGIX
+	e.Static("/video", "./video")
 }
 func send(msg map[string]interface{}) {
 	message, err := json.Marshal(msg)

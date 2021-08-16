@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo"
@@ -24,7 +25,7 @@ type Stream struct {
 var (
 	WS     = melody.New()
 	STREAM = &Stream{
-		Online: true,
+		Online: false,
 		Streams: map[string]string{
 			"240p": conf.Qualities.Low,
 			"480p": conf.Qualities.Mid,
@@ -106,6 +107,42 @@ func Router(e *echo.Echo) {
 		return nil
 	})
 	// Endpoints para NGIX
+	e.POST("/v1/streaming/on", func(c echo.Context) error {
+		data := map[string]interface{}{}
+		err := c.Bind(&data)
+		if err != nil {
+			return c.NoContent(http.StatusBadRequest)
+		}
+
+		// Configurar los nombres
+		STREAM.Streams = map[string]string{
+			"240p": strings.Replace(conf.Qualities.Low, "{name}", data["name"].(string), 1),
+			"480p": strings.Replace(conf.Qualities.Mid, "{name}", data["name"].(string), 1),
+			"720p": strings.Replace(conf.Qualities.High, "{name}", data["name"].(string), 1),
+		}
+
+		STREAM.Online = true
+		message := map[string]interface{}{
+			"action": "stream-started",
+			"data": map[string]interface{}{
+				"viewers": STREAM.Viewers,
+			},
+		}
+		send(message)
+		return c.NoContent(http.StatusOK)
+	})
+	e.POST("/v1/streaming/off", func(c echo.Context) error {
+		STREAM.Online = false
+		message := map[string]interface{}{
+			"action": "stream-ended",
+			"data": map[string]interface{}{
+				"viewers": STREAM.Viewers,
+			},
+		}
+		send(message)
+		STREAM.Chat = make([]map[string]interface{}, 0)
+		return c.NoContent(http.StatusOK)
+	})
 	e.Static("/video", "./video")
 }
 func send(msg map[string]interface{}) {

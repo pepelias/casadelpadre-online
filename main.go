@@ -1,6 +1,7 @@
 package main
 
 import (
+	"casadelpadre-online/config"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -10,6 +11,8 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/olahol/melody"
 )
+
+var conf = config.Get()
 
 type Stream struct {
 	Online  bool                     `json:"online"`
@@ -23,9 +26,9 @@ var (
 	STREAM = &Stream{
 		Online: true,
 		Streams: map[string]string{
-			"240p": "http://192.168.1.135:8080/video/video240.mp4",
-			"480p": "http://192.168.1.135:8080/video/video480.mp4",
-			"720p": "http://192.168.1.135:8080/video/video720.mp4",
+			"240p": conf.Qualities.Low,
+			"480p": conf.Qualities.Mid,
+			"720p": conf.Qualities.High,
 		},
 		Chat: make([]map[string]interface{}, 0),
 	}
@@ -34,7 +37,7 @@ var (
 func main() {
 	e := echo.New()
 	e.Pre(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000", "http://192.168.1.135:3000"},
+		AllowOrigins: conf.Server.Cors,
 	}))
 	Router(e)
 	// Websocket
@@ -76,7 +79,15 @@ func main() {
 			},
 		})
 	})
-	e.Start(":8080")
+
+	if conf.SSL.Cert != "" && conf.SSL.Key != "" {
+		e.Use(middleware.HTTPSNonWWWRedirect())
+		go func() {
+			e.StartTLS(conf.Server.SecurePort, conf.SSL.Cert, conf.SSL.Key)
+		}()
+	}
+
+	e.Start(conf.Server.Port)
 }
 func Router(e *echo.Echo) {
 	e.GET("/v1/streaming/online", func(c echo.Context) error {

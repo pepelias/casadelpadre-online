@@ -1,0 +1,15 @@
+{
+  "server": {
+    "port": ":8080",
+    "cors": [
+      "http://localhost:3000",
+      "http://172.19.48.1:3000",
+      "http://192.168.1.135:3000"
+    ]
+  },
+  "qualities": {
+    "high": "http://192.168.1.135:8080/video/video720.mp4",
+    "mid": "http://192.168.1.135:8080/video/video480.mp4",
+    "low": "http://192.168.1.135:8080/video/video240.mp4"
+  }
+}

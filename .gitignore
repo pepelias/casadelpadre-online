@@ -1,4 +1,7 @@
+casadelpadre-online
 *.exe
 *.dmg
 ./web/*
 video/
+.vscode/
+server_config/nginx.old.conf

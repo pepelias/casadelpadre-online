@@ -1,0 +1,12 @@
+[Unit]
+Description=Manejador del estado del stream y el chat
+
+[Service]
+User=root
+Group=root
+ExecStart=/home/casadelpadre-online
+WorkingDirectory=/home/
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -23,6 +23,11 @@ type Configuration struct {
 		Mid  string `json:"mid"`
 		Low  string `json:"low"`
 	} `json:"qualities"`
+	Streams struct {
+		High string `json:"high"`
+		Mid  string `json:"mid"`
+		Low  string `json:"low"`
+	} `json:"streams"`
 }
 
 var (

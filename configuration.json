@@ -1,4 +1,8 @@
 {
+  "ssl": {
+    "cert": "",
+    "key": ""
+  },
   "server": {
     "port": ":8080",
     "cors": [
@@ -11,5 +15,10 @@
     "high": "http://192.168.1.135:8080/video/video720.mp4",
     "mid": "http://192.168.1.135:8080/video/video480.mp4",
     "low": "http://192.168.1.135:8080/video/video240.mp4"
+  },
+  "streams": {
+    "high": "my_key",
+    "mid": "my_key_mid",
+    "low": "my_key_low"
   }
 }

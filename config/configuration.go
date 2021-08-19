@@ -18,16 +18,7 @@ type Configuration struct {
 		SecurePort string   `json:"secure_port"`
 		Cors       []string `json:"cors"`
 	} `json:"server"`
-	Qualities struct {
-		High string `json:"high"`
-		Mid  string `json:"mid"`
-		Low  string `json:"low"`
-	} `json:"qualities"`
-	Streams struct {
-		High string `json:"high"`
-		Mid  string `json:"mid"`
-		Low  string `json:"low"`
-	} `json:"streams"`
+	StreamURL string `json:"stream_url"`
 }
 
 var (

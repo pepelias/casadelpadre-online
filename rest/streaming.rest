@@ -1,0 +1,5 @@
+### Simular que comenzó el stream
+POST http://localhost:8080/v1/streaming/on
+
+### Simular que terminó el stream
+POST http://localhost:8080/v1/streaming/off

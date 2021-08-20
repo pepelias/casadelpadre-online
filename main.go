@@ -15,6 +15,7 @@ import (
 var conf = config.Get()
 
 type Stream struct {
+	started bool
 	Online  bool                     `json:"online"`
 	URL     string                   `json:"streams"`
 	Chat    []map[string]interface{} `json:"chat"`
@@ -101,23 +102,27 @@ func Router(e *echo.Echo) {
 	})
 	// Endpoints para NGIX
 	e.POST("/v1/streaming/on", func(c echo.Context) error {
-		if STREAM.Online {
+		if STREAM.started {
 			return c.NoContent(http.StatusOK)
 		}
-		// Están los 3 streams
-		STREAM.Online = true
-		time.Sleep(time.Second * 15)
-		message := map[string]interface{}{
-			"action": "stream-started",
-			"data": map[string]interface{}{
-				"viewers": STREAM.Viewers,
-			},
-		}
-		send(message)
+		STREAM.started = true
+		go func() {
+			// Están los 3 streams
+			time.Sleep(time.Second * 15)
+			STREAM.Online = true
+			message := map[string]interface{}{
+				"action": "stream-started",
+				"data": map[string]interface{}{
+					"viewers": STREAM.Viewers,
+				},
+			}
+			send(message)
+		}()
 		return c.NoContent(http.StatusOK)
 	})
 	e.POST("/v1/streaming/off", func(c echo.Context) error {
 		STREAM.Online = false
+		STREAM.started = false
 		message := map[string]interface{}{
 			"action": "stream-ended",
 			"data": map[string]interface{}{
